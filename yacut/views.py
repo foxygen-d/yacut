@@ -1,6 +1,6 @@
 from flask import Flask, abort, flash, redirect, render_template, url_for
 
-from . import app, db
+from . import BASE_URL, app, db
 from .forms import URLForm
 from .models import URLMap
 from .utils import check_symbols, get_unique_short_url
@@ -10,34 +10,35 @@ from .utils import check_symbols, get_unique_short_url
 def main_page_view():
     form = URLForm()
     if form.validate_on_submit():
-        short = form.custom_id.data
+        original_link = form.original_link.data
+        custom_id = form.custom_id.data
 
-        if URLMap.query.filter_by(short=short).first() is not None:
-            flash('Такая короткая URL-ссылка уже занята!')
+        if URLMap.query.filter_by(short=custom_id).first():
+            flash(f'Имя {custom_id} уже занято!')
             return render_template('main_page.html', form=form)
-        if short and not check_symbols(short):
+        if custom_id and not check_symbols(custom_id):
             flash('Допустимые символы: A-z, 0-9')
             return render_template('main_page.html', form=form)
 
-        if short is None:
-            short = get_unique_short_url()
+        if custom_id is None:
+            custom_id = get_unique_short_url()
 
         url = URLMap(
-            original=form.original_link.data, 
-            short=form.custom_id.data, 
+            original=original_link, 
+            short=custom_id, 
         )
         db.session.add(url)
         db.session.commit()
         return render_template('main_page.html',
                                form=form,
-                               short_url=url_for('redirect_to_url_view',
-                                                 short=short, _external=True))
+                               short_url=BASE_URL + url.short,
+                               original_link=url.original)
     return render_template('main_page.html', form=form)
 
 
 @app.route('/<string:short>', methods=['GET'])
 def redirect_to_url_view(short):
-    url = URLMap.query.filter_by(short=short).first_or_404()
+    url = URLMap.query.filter_by(short=short).first()
     if url is None:
         abort(404)
     return redirect(url.original)

@@ -7,5 +7,6 @@ app = Flask(__name__)
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+BASE_URL = 'http://localhost/'
 
-from . import error_handlers, views
+from . import api_views, error_handlers, views
