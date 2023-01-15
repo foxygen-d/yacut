@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+
 from settings import Config
 
 app = Flask(__name__)
@@ -9,4 +10,4 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 BASE_URL = 'http://localhost/'
 
-from . import api_views, error_handlers, views
+from . import api_views, error_handlers, models, views
