@@ -1,4 +1,4 @@
-from flask import Flask, abort, flash, redirect, render_template, url_for
+from flask import abort, flash, redirect, render_template
 
 from . import BASE_URL, app, db
 from .forms import URLForm
@@ -24,8 +24,8 @@ def main_page_view():
             custom_id = get_unique_short_url()
 
         url = URLMap(
-            original=original_link, 
-            short=custom_id, 
+            original=original_link,
+            short=custom_id,
         )
         db.session.add(url)
         db.session.commit()
