@@ -31,5 +31,5 @@ def page_not_found(error):
 
 def check_inique_short_url(custom_id):
     if URLMap.query.filter_by(short=custom_id).first():
-        return (f'Имя {custom_id} уже занято!')
+        return custom_id
     return None

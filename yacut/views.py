@@ -13,9 +13,9 @@ def main_page_view():
     if form.validate_on_submit():
         original_link = form.original_link.data
         custom_id = form.custom_id.data
-        error_message = check_inique_short_url(custom_id)
-        if error_message:
-            flash(error_message)
+
+        if check_inique_short_url(custom_id):
+            flash(f'Имя {custom_id} уже занято!')
             return render_template('main_page.html', form=form)
         if custom_id and not check_symbols(custom_id):
             flash('Допустимые символы: A-z, 0-9')
