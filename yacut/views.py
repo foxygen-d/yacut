@@ -1,6 +1,7 @@
 from flask import abort, flash, redirect, render_template
 
 from . import BASE_URL, app, db
+from .error_handlers import check_inique_short_url
 from .forms import URLForm
 from .models import URLMap
 from .utils import check_symbols, get_unique_short_url
@@ -12,9 +13,9 @@ def main_page_view():
     if form.validate_on_submit():
         original_link = form.original_link.data
         custom_id = form.custom_id.data
-
-        if URLMap.query.filter_by(short=custom_id).first():
-            flash(f'Имя {custom_id} уже занято!')
+        error_message = check_inique_short_url(custom_id)
+        if error_message:
+            flash(error_message)
             return render_template('main_page.html', form=form)
         if custom_id and not check_symbols(custom_id):
             flash('Допустимые символы: A-z, 0-9')
@@ -38,7 +39,5 @@ def main_page_view():
 
 @app.route('/<string:short>', methods=['GET'])
 def redirect_to_url_view(short):
-    url = URLMap.query.filter_by(short=short).first()
-    if url is None:
-        abort(404)
+    url = URLMap.query.filter_by(short=short).first_or_404()
     return redirect(url.original)
