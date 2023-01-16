@@ -26,7 +26,7 @@ def add_url():
         raise InvalidAPIUsage('Указано недопустимое имя для короткой ссылки', HTTPStatus.BAD_REQUEST)
 
     error_message = check_inique_short_url(custom_id)
-    if error_message:        
+    if error_message:
         raise InvalidAPIUsage((error_message), HTTPStatus.BAD_REQUEST)
 
     url = URLMap()
